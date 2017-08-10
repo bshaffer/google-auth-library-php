@@ -105,4 +105,14 @@ class FetchAuthTokenCache implements FetchAuthTokenInterface
     {
         return $this->fetcher->getLastReceivedToken();
     }
+
+    /**
+     * Returns the Google Project ID if the credentials have access to it.
+     *
+     * @return string|null
+     */
+    public function getProjectId()
+    {
+        return $this->fetcher->getProjectId();
+    }
 }

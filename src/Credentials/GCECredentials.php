@@ -65,6 +65,11 @@ class GCECredentials extends CredentialsLoader
     const TOKEN_URI_PATH = 'v1/instance/service-accounts/default/token';
 
     /**
+     * The metadata path of the default token.
+     */
+    const PROJECT_ID_URI_PATH = 'v1/project/project-id';
+
+    /**
      * The header whose presence indicates GCE presence.
      */
     const FLAVOR_HEADER = 'Metadata-Flavor';
@@ -98,6 +103,18 @@ class GCECredentials extends CredentialsLoader
         $base = 'http://' . self::METADATA_IP . '/computeMetadata/';
 
         return $base . self::TOKEN_URI_PATH;
+    }
+
+    /**
+     * The full uri for accessing the project ID.
+     *
+     * @return string
+     */
+    public static function getProjectIdUri()
+    {
+        $base = 'http://' . self::METADATA_IP . '/computeMetadata/';
+
+        return $base . self::PROJECT_ID_URI_PATH;
     }
 
     /**
@@ -154,7 +171,7 @@ class GCECredentials extends CredentialsLoader
      * Implements FetchAuthTokenInterface#fetchAuthToken.
      *
      * Fetches the auth tokens from the GCE metadata host if it is available.
-     * If $httpHandler is not specified a the default HttpHandler is used.
+     * If $httpHandler is not specified the default HttpHandler is used.
      *
      * @param callable $httpHandler callback which delivers psr7 request
      *
@@ -215,5 +232,36 @@ class GCECredentials extends CredentialsLoader
         }
 
         return null;
+    }
+
+    /**
+     * Retrieves the project ID from the GCE metadata host if it is available.
+     * If $httpHandler is not specified the default HttpHandler is used.
+     *
+     * @param callable $httpHandler callback which delivers psr7 request
+     *
+     * @return string|null the project ID if available
+     */
+    public function getProjectId(callable $httpHandler = null)
+    {
+        if (is_null($httpHandler)) {
+            $httpHandler = HttpHandlerFactory::build();
+        }
+        if (!$this->hasCheckedOnGce) {
+            $this->isOnGce = self::onGce($httpHandler);
+        }
+        if (!$this->isOnGce) {
+            return null;  // return null if we cannot get the projcet ID
+        }
+        $resp = $httpHandler(
+            new Request(
+                'GET',
+                self::getTokenUri(),
+                [self::FLAVOR_HEADER => 'Google']
+            )
+        );
+        $projectId = (string) $resp->getBody();
+
+        return $projectId;
     }
 }

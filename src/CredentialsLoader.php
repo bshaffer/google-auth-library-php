@@ -28,6 +28,8 @@ abstract class CredentialsLoader implements FetchAuthTokenInterface
 {
     const TOKEN_CREDENTIAL_URI = 'https://www.googleapis.com/oauth2/v4/token';
     const ENV_VAR = 'GOOGLE_APPLICATION_CREDENTIALS';
+    const PROJECT_ENV_VAR = 'GOOGLE_CLOUD_PROJECT';
+    const LEGACY_PROJECT_ENV_VAR = 'GCLOUD_PROJECT';
     const WELL_KNOWN_PATH = 'gcloud/application_default_credentials.json';
     const NON_WINDOWS_WELL_KNOWN_PATH_BASE = '.config';
     const AUTH_METADATA_KEY = 'authorization';
@@ -159,5 +161,29 @@ abstract class CredentialsLoader implements FetchAuthTokenInterface
         $metadata_copy[self::AUTH_METADATA_KEY] = array('Bearer ' . $result['access_token']);
 
         return $metadata_copy;
+    }
+
+    /**
+     * Returns the default Google Project ID from environment variables.
+     *
+     * @return string|null
+     */
+    public static function defaultProjectId()
+    {
+        $projectId = getenv(self::PROJECT_ENV_VAR);
+        if (empty($projectId)) {
+            $projectId = getenv(self::LEGACY_PROJECT_ENV_VAR);
+        }
+        return $projectId;
+    }
+
+    /**
+     * Returns the Google Project ID if the credentials have access to it.
+     *
+     * @return string|null
+     */
+    public function getProjectId()
+    {
+        return null;
     }
 }

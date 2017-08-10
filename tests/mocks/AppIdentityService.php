@@ -4,6 +4,7 @@ namespace google\appengine\api\app_identity;
 
 class AppIdentityService
 {
+    public static $applicationId;
     public static $scope;
     public static $accessToken = array(
         'access_token' => 'xyz',
@@ -15,5 +16,10 @@ class AppIdentityService
         self::$scope = $scope;
 
         return self::$accessToken;
+    }
+
+    public static function getApplicationId()
+    {
+        return $applicationId;
     }
 }

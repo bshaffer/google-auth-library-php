@@ -122,6 +122,17 @@ class AppIdentityCredentials extends CredentialsLoader
     }
 
     /**
+     * Caching is handled by the underlying AppIdentityService, return empty string
+     * to prevent caching.
+     *
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return '';
+    }
+
+    /**
      * @return array|null
      */
     public function getLastReceivedToken()
@@ -137,13 +148,23 @@ class AppIdentityCredentials extends CredentialsLoader
     }
 
     /**
-     * Caching is handled by the underlying AppIdentityService, return empty string
-     * to prevent caching.
+     * Retrieves the project ID using the AppIdentityService
      *
-     * @return string
+     * @return string|null
      */
-    public function getCacheKey()
+    public function getProjectId()
     {
-        return '';
+        if (!self::onAppEngine()) {
+            return null;
+        }
+
+        if (!class_exists('google\appengine\api\app_identity\AppIdentityService')) {
+            throw new \Exception(
+                'This class must be run in App Engine, or you must include the AppIdentityService '
+                . 'mock class defined in tests/mocks/AppIdentityService.php'
+            );
+        }
+
+        return AppIdentityService::getApplicationId();
     }
 }

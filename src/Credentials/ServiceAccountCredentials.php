@@ -56,6 +56,13 @@ use Google\Auth\OAuth2;
 class ServiceAccountCredentials extends CredentialsLoader
 {
     /**
+     * The project ID if passed in as part of the JSON file.
+     *
+     * @var string
+     */
+    private $projectId;
+
+    /**
      * The OAuth2 instance used to conduct authorization.
      *
      * @var OAuth2
@@ -93,6 +100,9 @@ class ServiceAccountCredentials extends CredentialsLoader
         if (!array_key_exists('private_key', $jsonKey)) {
             throw new \InvalidArgumentException(
                 'json key is missing the private_key field');
+        }
+        if (array_key_exists('project_id', $jsonKey)) {
+            $this->projectId = $jsonKey['project_id'];
         }
         $this->auth = new OAuth2([
             'audience' => self::TOKEN_CREDENTIAL_URI,
@@ -164,6 +174,16 @@ class ServiceAccountCredentials extends CredentialsLoader
         $jwtCreds = new ServiceAccountJwtAccessCredentials($credJson);
 
         return $jwtCreds->updateMetadata($metadata, $authUri, $httpHandler);
+    }
+
+    /**
+     * Retrieves the project ID if passed in as part of the JSON file.
+     *
+     * @return string|null
+     */
+    public function getProjectId()
+    {
+        return $this->projectId;
     }
 
     /**
