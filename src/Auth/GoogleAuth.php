@@ -108,7 +108,7 @@ class GoogleAuth
             'scope' => null,
             'targetAudience' => null,
             'httpClient' => null,
-            'lifetime' => null,
+            'cacheLifetime' => null,
             'cache' => null,
             'quotaProject' => null,
             'subject' => null,
@@ -176,48 +176,6 @@ class GoogleAuth
         }
 
         return $creds;
-    }
-
-    /**
-     * Create an authorized HTTP Client from an instance of FetchAuthTokenInterface.
-     *
-     * @param FetchAuthTokenInterface $fetcher is used to fetch the auth token
-     * @param array $httpClientOptions (optional) Array of request options to apply.
-     * @param callable $httpClient (optional) http client to fetch the token.
-     * @param callable $tokenCallback (optional) function to be called when a new token is fetched.
-     * @return \GuzzleHttp\Client
-     */
-    public function makeHttpClient(array $options = []): ClientInterface
-    {
-        $version = \GuzzleHttp\ClientInterface::VERSION;
-
-        switch ($version[0]) {
-            case '5':
-                $client = new \GuzzleHttp\Client($httpClientOptions);
-                $client->setDefaultOption('auth', 'google_auth');
-                $subscriber = new Subscriber\AuthTokenSubscriber(
-                    $fetcher,
-                    $httpClient,
-                    $tokenCallback
-                );
-                $client->getEmitter()->attach($subscriber);
-                return $client;
-            case '6':
-                $middleware = new Middleware\AuthTokenMiddleware(
-                    $fetcher,
-                    $httpClient,
-                    $tokenCallback
-                );
-                $stack = \GuzzleHttp\HandlerStack::create();
-                $stack->push($middleware);
-
-                return new \GuzzleHttp\Client([
-                   'handler' => $stack,
-                   'auth' => 'google_auth',
-                ] + $httpClientOptions);
-            default:
-                throw new \Exception('Version not supported');
-        }
     }
 
     /**
