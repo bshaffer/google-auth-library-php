@@ -34,7 +34,7 @@ class ApiKeyClient implements ClientInterface
         string $apiKey,
         ClientInterface $httpClient = null
     ) {
-        $this->apiKey = $apiKey
+        $this->apiKey = $apiKey;
         $this->httpClient = $httpClient ?: ClientFactory::build();
     }
 
@@ -43,7 +43,7 @@ class ApiKeyClient implements ClientInterface
         array $options = []
     ) {
         return $this->httpClient->send(
-            $this->applyApiKey($request)
+            $this->applyApiKey($request),
             $options
         );
     }
@@ -53,7 +53,7 @@ class ApiKeyClient implements ClientInterface
         array $options = []
     ) {
         return $this->httpClient->sendRequestAsync(
-            $this->applyApiKey($request)
+            $this->applyApiKey($request),
             $options
         );
     }

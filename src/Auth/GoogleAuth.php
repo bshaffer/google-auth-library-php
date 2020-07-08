@@ -77,6 +77,8 @@ class GoogleAuth
     private const WELL_KNOWN_PATH = 'gcloud/application_default_credentials.json';
     private const NON_WINDOWS_WELL_KNOWN_PATH_BASE = '.config';
 
+    private $httpClient;
+
     /**
      * Obtains an AuthTokenMiddleware which will fetch an access token to use in
      * the Authorization header. The middleware is configured with the default
@@ -121,7 +123,11 @@ class GoogleAuth
                 throw new \InvalidArgumentException('json key is missing the type field');
             }
 
-            $jsonKey['quota_project'] = $options['quotaProject'];
+            // Set quota project on jsonKey if passed in
+            if (isset($options['quotaProject'])) {
+                $jsonKey['quota_project'] = $options['quotaProject'];
+            }
+
             switch ($jsonKey['type']) {
                 case 'service_account':
                     if ($options['scope'] || $options['targetAudience']) {
@@ -157,6 +163,7 @@ class GoogleAuth
             $creds = new ComputeCredentials([
                 'scope' => $options['scope'],
                 'quotaProject' => $options['quotaProject'],
+                'httpClient' => $httpClient,
             ]);
         }
 
@@ -180,7 +187,8 @@ class GoogleAuth
      * @param callable $tokenCallback (optional) function to be called when a new token is fetched.
      * @return \GuzzleHttp\Client
      */
-    public function makeHttpClient(array $options = []): ClientInterface {
+    public function makeHttpClient(array $options = []): ClientInterface
+    {
         $version = \GuzzleHttp\ClientInterface::VERSION;
 
         switch ($version[0]) {

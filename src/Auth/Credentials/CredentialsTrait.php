@@ -58,13 +58,19 @@ trait CredentialsTrait
      */
     public function getRequestMetadata(
         ClientInterface $httpHandler = null
-    ): array {
+    ): array
+    {
         $result = $this->fetchAuthToken($httpHandler);
         if (isset($result['access_token'])) {
             return ['Authorization' => 'Bearer ' . $result['access_token']];
         }
 
         return [];
+    }
+
+    private function validateOptions(array $options, array $validKeys, array $requiredKeys = [])
+    {
+
     }
 
     /**

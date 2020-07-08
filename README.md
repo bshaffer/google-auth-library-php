@@ -3,10 +3,9 @@
 <dl>
   <dt>Homepage</dt><dd><a href="http://www.github.com/google/google-auth-library-php">http://www.github.com/google/google-auth-library-php</a></dd>
   <dt>Authors</dt>
-    <dd><a href="mailto:stanleycheung@google.com">Stanley Cheung</a></dd>
     <dd><a href="mailto:betterbrent@google.com">Brent Shaffer</a></dd>
     <dd><a href="mailto:dsuppleee@google.com">David Supplee</a></dd>
-  <dt>Copyright</dt><dd>Copyright © 2020 Google, Inc.</dd>
+  <dt>Copyright</dt><dd>Copyright © 2020 Google LLC</dd>
   <dt>License</dt><dd>Apache 2.0</dd>
 </dl>
 
@@ -18,17 +17,10 @@ authorization and authentication with Google APIs.
 ### Installing via Composer
 
 The recommended way to install the google auth library is through
-[Composer](http://getcomposer.org).
+[Composer](http://getcomposer.org). Run the Composer command to install the latest stable version:
 
 ```bash
-# Install Composer
-curl -sS https://getcomposer.org/installer | php
-```
-
-Next, run the Composer command to install the latest stable version:
-
-```bash
-composer.phar require google/auth
+composer require google/auth
 ```
 
 ## Application Default Credentials
@@ -78,7 +70,7 @@ credentials file, the following code should output a list of your Drive files.
 
 ```php
 use Google\Auth\GoogleAuth;
-use Psr\Http\Message\Request;
+use GuzzleHttp\Psr7\Request;
 
 // specify the path to your application credentials
 putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/my/credentials.json');
@@ -87,13 +79,13 @@ putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/my/credentials.json');
 $scopes = ['https://www.googleapis.com/auth/drive.readonly'];
 
 // create the auth client
-$auth = new GoogleAuth(['scope' => $scopes]);
+$auth = new GoogleAuth();
 
 // authorize an http client
-$client = $auth->makeHttpClient();
+$client = $auth->makeHttpClient(['scope' => $scope]);
 
 // make the request
-$request = new Request('https://www.googleapis.com/drive/v2/files');
+$request = new Request('GET', 'https://www.googleapis.com/drive/v2/files');
 $response = $client->send($request);
 
 // show the result!
@@ -108,7 +100,7 @@ this, use the static method `getIdTokenMiddleware` on
 
 ```php
 use Google\Auth\GoogleAuth;
-use Psr\Http\Message\Request;
+use GuzzleHttp\Psr7\Request;
 
 // specify the path to your application credentials
 putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/my/credentials.json');
@@ -120,13 +112,13 @@ putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/my/credentials.json');
 $targetAudience = 'YOUR_ID_TOKEN_AUDIENCE';
 
 // create the auth client
-$auth = new GoogleAuth(['targetAudience' => $targetAudience]);
+$auth = new GoogleAuth();
 
 // authorize an http client
-$client = $auth->makeHttpClient();
+$client = $auth->makeHttpClient(['targetAudience' => $targetAudience]);
 
 // make the request
-$request = new Request('https://YOUR_PROTECTED_RESOURCE');
+$request = new Request('GET', 'https://YOUR_PROTECTED_RESOURCE');
 $response = $client->send($request);
 
 // show the result!

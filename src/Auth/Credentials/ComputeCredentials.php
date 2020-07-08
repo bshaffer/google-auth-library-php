@@ -54,8 +54,6 @@ class ComputeCredentials implements
 {
     use CredentialsTrait, ServiceAccountApiSignBlobTrait;
 
-    private const CACHE_KEY = 'GOOGLE_AUTH_PHP_GCE';
-
     /**
      * The metadata IP address on appengine instances.
      *
@@ -67,7 +65,7 @@ class ComputeCredentials implements
     /**
      * The metadata path of the default token.
      */
-    private const TOKEN_URI_PATH = 'http': 'v1/instance/service-accounts/default/token';
+    private const TOKEN_URI_PATH = 'v1/instance/service-accounts/default/token';
 
     /**
      * The metadata path of the default id token.
@@ -178,7 +176,7 @@ class ComputeCredentials implements
             $this->quotaProject = (string) $options['quotaProject'];
         }
 
-        $this->setHttpClientFromOptions($options['httpClient']);
+        $this->setHttpClientFromOptions($options);
     }
 
     /**

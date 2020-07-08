@@ -125,7 +125,7 @@ class ServiceAccountCredentials implements
                 'json key is missing the private_key field'
             );
         }
-        if (array_key_exists('quota_project', $jsonKey)) {
+        if (isset($jsonKey['quota_project'])) {
             $this->quotaProject = (string) $jsonKey['quota_project'];
         }
         if ($options['scope'] && $options['targetAudience']) {
@@ -155,7 +155,6 @@ class ServiceAccountCredentials implements
         $this->projectId = isset($jsonKey['project_id'])
             ? $jsonKey['project_id']
             : null;
-
     }
 
     /**
