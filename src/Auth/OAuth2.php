@@ -320,6 +320,7 @@ class OAuth2
     public function __construct(array $config)
     {
         $opts = array_merge([
+            'credentialsFile' => null,
             'httpClient' => null,
             'expiry' => self::DEFAULT_EXPIRY_SECONDS,
             'extensionParams' => [],
@@ -341,6 +342,26 @@ class OAuth2
             'scope' => null,
             'additionalClaims' => [],
         ], $config);
+
+        if (isset($opts['credentialsFile'])) {
+            if (!file_exists($opts['credentialsFile'])) {
+                throw new InvalidArgumentException('Unable to read credentialsFile');
+            }
+            $creds = file_get_contents($opts['credentialsFile']);
+            $jsonKey = json_decode($creds, true);
+            if (!array_key_exists('type', $jsonKey)) {
+                throw new \InvalidArgumentException('json key is missing the type field');
+            }
+            if (isset($jsonKey['client_id'])) {
+                $opts['clientId'] = $jsonKey['client_id'];
+            }
+            if (isset($jsonKey['client_secret'])) {
+                $opts['clientSecret'] = $jsonKey['client_secret'];
+            }
+            if (isset($jsonKey['refresh_token'])) {
+                $opts['refreshToken'] = $jsonKey['refresh_token'];
+            }
+        }
 
         $this->httpClient = $opts['httpClient'] ?: ClientFactory::build();
         $this->setAuthorizationUri($opts['authorizationUri']);

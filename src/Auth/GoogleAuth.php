@@ -142,10 +142,19 @@ class GoogleAuth
             'audience' => null,
             'quotaProject' => null,
             'subject' => null,
+            'credentialsFile' => null,
         ];
-        $creds = null;
-        $jsonKey = self::fromEnv() ?: self::fromWellKnownFile();
+        if (is_null($options['credentialsFile'])) {
+            $jsonKey = self::fromEnv() ?: self::fromWellKnownFile();
+        } else {
+            if (!file_exists($options['credentialsFile'])) {
+                throw new InvalidArgumentException('Unable to read credentialsFile');
+            }
+            $creds = file_get_contents($options['credentialsFile']);
+            $jsonKey = json_decode($creds, true);
+        }
 
+        $creds = null;
         if (!is_null($jsonKey)) {
             if (!array_key_exists('type', $jsonKey)) {
                 throw new \InvalidArgumentException('json key is missing the type field');
