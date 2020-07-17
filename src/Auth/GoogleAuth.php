@@ -25,6 +25,7 @@ use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
 use Google\Auth\Credentials\CredentialsInterface;
 use Google\Auth\Http\ClientFactory;
+use Google\Cache\MemoryCacheItemPool;
 use InvalidArgumentException;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -78,6 +79,40 @@ class GoogleAuth
     private const NON_WINDOWS_WELL_KNOWN_PATH_BASE = '.config';
 
     private $httpClient;
+    private $cache;
+    private $cacheLifetime;
+    private $cachePrefix;
+
+    /**
+     * Obtains an AuthTokenMiddleware which will fetch an access token to use in
+     * the Authorization header. The middleware is configured with the default
+     * FetchAuthTokenInterface implementation to use in this environment.
+     *
+     * If supplied, $scope is used to in creating the credentials instance if
+     * this does not fallback to the Compute Engine defaults.
+     *
+     * @param array $options {
+     *      @type ClientInterface $httpClient client which delivers psr7 request
+     *      @type CacheItemPoolInterface $cache A cache implementation, may be
+     *             provided if you have one already available for use.
+     *      @type int $cacheLifetime
+     *      @type string $cachePrefix
+     * }
+     */
+    public function __construct(array $options = [])
+    {
+        $options += [
+            'httpClient' => null,
+            'cache' => null,
+            'cacheLifetime' => 1500,
+            'cachePrefix' => '',
+        ];
+
+        $this->httpClient = $options['httpClient'] ?: ClientFactory::build();
+        $this->cache = $options['cachePrefix'] ?: new MemoryCacheItemPool();
+        $this->cacheLifetme = $options['cacheLifetime'];
+        $this->cachePrefix = $options['cachePrefix'];
+    }
 
     /**
      * Obtains an AuthTokenMiddleware which will fetch an access token to use in
@@ -91,13 +126,10 @@ class GoogleAuth
      *      @type string|array scope the scope of the access request, expressed
      *             either as an Array or as a space-delimited String.
      *      @type string $targetAudience The audience for the ID token.
-     *      @type ClientInterface $httpClient client which delivers psr7 request
-     *      @type CacheItemPoolInterface $cache A cache implementation, may be
-     *             provided if you have one already available for use.
-     *      @type int $cacheLifetime
-     *      @type string $cachePrefix
+     *      @type string $audience
      *      @type string $quotaProject specifies a project to bill for access
      *        charges associated with the request.
+     *      @type string $subject
      * }
      * @return CredentialsInterface
      * @throws DomainException if no implementation can be obtained.
@@ -105,19 +137,14 @@ class GoogleAuth
     public function makeCredentials(array $options = []): CredentialsInterface
     {
         $options += [
-            'audience' => null,
             'scope' => null,
             'targetAudience' => null,
-            'httpClient' => null,
-            'cacheLifetime' => null,
-            'cache' => null,
+            'audience' => null,
             'quotaProject' => null,
             'subject' => null,
         ];
         $creds = null;
         $jsonKey = self::fromEnv() ?: self::fromWellKnownFile();
-
-        $httpClient = $options['httpClient'] ?: ClientFactory::build();
 
         if (!is_null($jsonKey)) {
             if (!array_key_exists('type', $jsonKey)) {
@@ -135,7 +162,7 @@ class GoogleAuth
                         $creds = new ServiceAccountJwtAccessCredentials(
                             $jsonKey,
                             [
-                                'httpClient' => $httpClient,
+                                'httpClient' => $this->httpClient,
                                 'audience' => $options['audience'],
                             ]
                         );
@@ -143,7 +170,7 @@ class GoogleAuth
                         $creds = new ServiceAccountCredentials($jsonKey, [
                             'scope' => $options['scope'],
                             'targetAudience' => $options['targetAudience'],
-                            'httpClient' => $httpClient,
+                            'httpClient' => $this->httpClient,
                             'subject' => $options['subject'],
                         ]);
                     }
@@ -167,7 +194,7 @@ class GoogleAuth
             $creds = new ComputeCredentials([
                 'scope' => $options['scope'],
                 'quotaProject' => $options['quotaProject'],
-                'httpClient' => $httpClient,
+                'httpClient' => $this->httpClient,
             ]);
         }
 
