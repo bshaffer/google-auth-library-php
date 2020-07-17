@@ -105,6 +105,7 @@ class GoogleAuth
     public function makeCredentials(array $options = []): CredentialsInterface
     {
         $options += [
+            'audience' => null,
             'scope' => null,
             'targetAudience' => null,
             'httpClient' => null,
@@ -130,18 +131,21 @@ class GoogleAuth
 
             switch ($jsonKey['type']) {
                 case 'service_account':
-                    if ($options['scope'] || $options['targetAudience']) {
+                    if ($options['audience']) {
+                        $creds = new ServiceAccountJwtAccessCredentials(
+                            $jsonKey,
+                            [
+                                'httpClient' => $httpClient,
+                                'audience' => $options['audience'],
+                            ]
+                        );
+                    } else {
                         $creds = new ServiceAccountCredentials($jsonKey, [
                             'scope' => $options['scope'],
                             'targetAudience' => $options['targetAudience'],
                             'httpClient' => $httpClient,
                             'subject' => $options['subject'],
                         ]);
-                    } else {
-                        $creds = new ServiceAccountJwtAccessCredentials(
-                            $jsonKey,
-                            ['httpClient' => $httpClient]
-                        );
                     }
                     break;
                 case 'authorized_user':

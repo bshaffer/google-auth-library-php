@@ -91,6 +91,7 @@ class ServiceAccountJwtAccessCredentials implements
             'sub' => $jsonKey['client_email'],
             'signingAlgorithm' => 'RS256',
             'signingKey' => $jsonKey['private_key'],
+            'audience' => $options['audience']
         ]);
 
         $this->projectId = isset($jsonKey['project_id'])
