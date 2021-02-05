@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="robots" content="index, follow, all" />
-    <title>Google\Auth\HttpHandler | Google Auth Library for PHP API Reference</title>
+    <title>Google\Auth\GCECache | Google Auth Library for PHP API Reference</title>
 
             <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap-theme.min.css">
@@ -19,7 +19,7 @@
     
     </head>
 
-    <body id="namespace" data-name="namespace:Google_Auth_HttpHandler" data-root-path="../../">
+    <body id="class" data-name="class:Google_Auth_GCECache" data-root-path="../../">
             <div id="content">
         <div id="left-column">
                 <div id="control-panel">
@@ -87,61 +87,48 @@
         </div>
     </nav>
 
-                <div class="namespace-breadcrumbs">
-        <ol class="breadcrumb">
-            <li><span class="label label-default">Namespace</span></li>
-                    <li><a href="../../Google.html">Google</a></li><li class="backslash">\</li><li><a href="../../Google/Auth.html">Auth</a></li><li class="backslash">\</li><li><a href="../../Google/Auth/HttpHandler.html">HttpHandler</a></li><li class="backslash">\</li>
-        </ol>
-    </div>
-            <div id="page-content">
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../Google.html">Google</a></li><li class="backslash">\</li><li><a href="../../Google/Auth.html">Auth</a></li><li class="backslash">\</li><li>GCECache</li>
+            </ol>
+        </div>
+                <div id="page-content">
                 
     <div class="page-header">
-        <h1>Google\Auth\HttpHandler</h1>
+        <h1>
+            GCECache
+                
+        </h1>
     </div>
 
+    <p>    class
+    <strong>GCECache</strong>        (<a href="https://github.com/googleapis/google-auth-library-php/blob/master/src/GCECache.php">View source</a>)
+</p>
+
+        
     
-            <h2>Classes</h2>
+
+            <div class="description">
+            <p>A class to implement caching for calls to GCECredentials::onGce. This class
+is used automatically when you pass a <code>Psr\Cache\CacheItemPoolInterface</code>
+cache object to <code>ApplicationDefaultCredentials::getCredentials</code>.</p>            <p><pre><code>$sysvCache = new Google\Auth\SysvCacheItemPool();
+$creds = Google\Auth\ApplicationDefaultCredentials::getCredentials(
+    $scope,
+    null,
+    null,
+    $sysvCache
+);
+</code></pre>
+</p>                    </div>
+    
+            <h2>Traits</h2>
+
         
     <div class="container-fluid underlined">
                     <div class="row">
                 <div class="col-md-6">
-                                            <a href="../../Google/Auth/HttpHandler/Guzzle5HttpHandler.html"><abbr title="Google\Auth\HttpHandler\Guzzle5HttpHandler">Guzzle5HttpHandler</abbr></a>
-                                            
-                </div>
-                <div class="col-md-6">
-                    
-                </div>
-            </div>
-                    <div class="row">
-                <div class="col-md-6">
-                                            <a href="../../Google/Auth/HttpHandler/Guzzle6HttpHandler.html"><abbr title="Google\Auth\HttpHandler\Guzzle6HttpHandler">Guzzle6HttpHandler</abbr></a>
-                                            
-                </div>
-                <div class="col-md-6">
-                    
-                </div>
-            </div>
-                    <div class="row">
-                <div class="col-md-6">
-                                            <a href="../../Google/Auth/HttpHandler/Guzzle7HttpHandler.html"><abbr title="Google\Auth\HttpHandler\Guzzle7HttpHandler">Guzzle7HttpHandler</abbr></a>
-                                            
-                </div>
-                <div class="col-md-6">
-                    
-                </div>
-            </div>
-                    <div class="row">
-                <div class="col-md-6">
-                                            <a href="../../Google/Auth/HttpHandler/HttpClientCache.html"><abbr title="Google\Auth\HttpHandler\HttpClientCache">HttpClientCache</abbr></a>
-                                            
-                </div>
-                <div class="col-md-6">
-                    Stores an HTTP Client in order to prevent multiple instantiations.
-                </div>
-            </div>
-                    <div class="row">
-                <div class="col-md-6">
-                                            <a href="../../Google/Auth/HttpHandler/HttpHandlerFactory.html"><abbr title="Google\Auth\HttpHandler\HttpHandlerFactory">HttpHandlerFactory</abbr></a>
+                                            <a href="../../Google/Auth/CacheTrait.html"><abbr title="Google\Auth\CacheTrait">CacheTrait</abbr></a>
                                             
                 </div>
                 <div class="col-md-6">
@@ -150,7 +137,128 @@
             </div>
             </div>
     
+            <h2>Constants</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td>GCE_CACHE_KEY</td>
+                <td class="last">
+                    <p><em></em></p>
+                    <p></p>
+                </td>
+            </tr>
+            </table>
+
     
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___construct">__construct</a>(array $cacheConfig = null, <abbr title="Psr\Cache\CacheItemPoolInterface">CacheItemPoolInterface</abbr> $cache = null)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_onGce">onGce</a>(callable $httpHandler = null)
+        
+                                            <p>Caches the result of onGce so the metadata server is not called multiple
+times.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at         <a href="https://github.com/googleapis/google-auth-library-php/blob/master/src/GCECache.php#L58">line 58</a></div>
+        <code>                    
+    <strong>__construct</strong>(array $cacheConfig = null, <abbr title="Psr\Cache\CacheItemPoolInterface">CacheItemPoolInterface</abbr> $cache = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>array</td>
+                <td>$cacheConfig</td>
+                <td>Configuration for the cache</td>
+            </tr>
+                    <tr>
+                <td><abbr title="Psr\Cache\CacheItemPoolInterface">CacheItemPoolInterface</abbr></td>
+                <td>$cache</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_onGce">
+        <div class="location">at         <a href="https://github.com/googleapis/google-auth-library-php/blob/master/src/GCECache.php#L76">line 76</a></div>
+        <code>                    bool
+    <strong>onGce</strong>(callable $httpHandler = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Caches the result of onGce so the metadata server is not called multiple
+times.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>callable</td>
+                <td>$httpHandler</td>
+                <td>callback which delivers psr7 request</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td>True if this a GCEInstance, false otherwise</td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
     
             </div>
                 <div id="footer">
