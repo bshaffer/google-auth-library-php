@@ -428,7 +428,6 @@ class OAuth2 implements FetchAuthTokenInterface
 
         $assertion = [
             'iss' => $this->getIssuer(),
-            'aud' => $this->getAudience(),
             'exp' => ($now + $this->getExpiry()),
             'iat' => ($now - $opts['skew']),
         ];
@@ -437,8 +436,12 @@ class OAuth2 implements FetchAuthTokenInterface
                 throw new \DomainException($k . ' should not be null');
             }
         }
-        if (!(is_null($this->getScope()))) {
+        if (!is_null($this->getAudience())) {
+            $assertion['aud'] = $this->getAudience();
+        } elseif (!is_null($this->getScope())) {
             $assertion['scope'] = $this->getScope();
+        } else {
+            throw new \DomainException('must have one of aud or scope');
         }
         if (!(is_null($this->getSub()))) {
             $assertion['sub'] = $this->getSub();

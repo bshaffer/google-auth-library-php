@@ -82,11 +82,13 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
         if (array_key_exists('quota_project_id', $jsonKey)) {
             $this->quotaProject = (string) $jsonKey['quota_project_id'];
         }
+        $scope = empty($jsonKey['scope']) ? null : $jsonKey['scope'];
         $this->auth = new OAuth2([
             'issuer' => $jsonKey['client_email'],
             'sub' => $jsonKey['client_email'],
             'signingAlgorithm' => 'RS256',
             'signingKey' => $jsonKey['private_key'],
+            'scope' => $scope,
         ]);
 
         $this->projectId = isset($jsonKey['project_id'])
@@ -107,11 +109,14 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
         $authUri = null,
         callable $httpHandler = null
     ) {
-        if (empty($authUri)) {
-            return $metadata;
-        }
+        $scope = $this->auth->getScope();
+        if (empty($scope)) {
+            if (empty($authUri)) {
+                return $metadata;
+            }
 
-        $this->auth->setAudience($authUri);
+            $this->auth->setAudience($authUri);
+        }
 
         return parent::updateMetadata($metadata, $authUri, $httpHandler);
     }
@@ -127,9 +132,12 @@ class ServiceAccountJwtAccessCredentials extends CredentialsLoader implements
      */
     public function fetchAuthToken(callable $httpHandler = null)
     {
-        $audience = $this->auth->getAudience();
-        if (empty($audience)) {
-            return null;
+        $scope = $this->auth->getScope();
+        if (empty($scope)) {
+            $audience = $this->auth->getAudience();
+            if (empty($audience)) {
+                return null;
+            }
         }
 
         $access_token = $this->auth->toJwt();

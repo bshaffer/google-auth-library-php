@@ -89,6 +89,11 @@ class ServiceAccountCredentials extends CredentialsLoader implements
      */
     private $lastReceivedJwtAccessToken;
 
+    /*
+     * @var array|null
+     */
+    private $preferOAuth;
+
     /**
      * Create a new ServiceAccountCredentials.
      *
@@ -99,12 +104,15 @@ class ServiceAccountCredentials extends CredentialsLoader implements
      * @param string $sub an email address account to impersonate, in situations when
      *   the service account has been delegated domain wide access.
      * @param string $targetAudience The audience for the ID token.
+     * @param bool   $preferOAuth When true, the oauth API is used instead of self-signed
+     *   JWT tokens
      */
     public function __construct(
         $scope,
         $jsonKey,
         $sub = null,
-        $targetAudience = null
+        $targetAudience = null,
+        $preferOAuth = false
     ) {
         if (is_string($jsonKey)) {
             if (!file_exists($jsonKey)) {
@@ -218,15 +226,16 @@ class ServiceAccountCredentials extends CredentialsLoader implements
         $authUri = null,
         callable $httpHandler = null
     ) {
-        // scope exists. use oauth implementation
+        // "useSelfSignedJwt" now always evaluates to true, so this will never be called
         if (!$this->useSelfSignedJwt()) {
             return parent::updateMetadata($metadata, $authUri, $httpHandler);
         }
 
-        // no scope found. create jwt with the auth uri
+        // Create jwt with the auth uri
         $credJson = array(
             'private_key' => $this->auth->getSigningKey(),
             'client_email' => $this->auth->getIssuer(),
+            'scope' => $this->auth->getScope(),
         );
         $jwtCreds = new ServiceAccountJwtAccessCredentials($credJson);
 
@@ -274,6 +283,9 @@ class ServiceAccountCredentials extends CredentialsLoader implements
 
     private function useSelfSignedJwt()
     {
-        return is_null($this->auth->getScope());
+        // Scopes are now a valid part of the JWT claim, so we can always self-sign.
+        // This is only false if explicitly configured by the user to prefer the
+        // oauth token endpoint.
+        return !$this->preferOAuth;
     }
 }
